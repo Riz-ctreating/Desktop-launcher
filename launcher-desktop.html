@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Launcher Desktop</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);
+--win:#f3f5f7;--ink:#14212b;--bar:#d3dce3;--line:#b9c5ce;--task:#0f1c26;--acc:#e0a526;--key:#e4eaee;
+color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--win:#1c262e;--ink:#e8eef2;--bar:#2c3a44;--line:#42535f;--key:#2a3741;color-scheme:dark}}
+:root[data-theme="dark"]{--win:#1c262e;--ink:#e8eef2;--bar:#2c3a44;--line:#42535f;--key:#2a3741;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;background:#1d3b53 linear-gradient(160deg,#1d3b53,#3a7a8c);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:var(--ink)}
+body{height:100%;margin:0;display:flex;flex-direction:column;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
+button{font:inherit;color:inherit;cursor:pointer}
+#desk{flex:1;position:relative;overflow:hidden;min-height:0}
+#icons{display:grid;grid-template-columns:repeat(auto-fill,78px);gap:6px;padding:14px;align-content:start}
+.ic{background:none;border:0;border-radius:10px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:12px;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.ic span{font-size:34px;line-height:1}
+.ai{width:44px;height:44px;border-radius:10px;display:block}
+#menu .ai{width:28px;height:28px;border-radius:6px}
+.ic:active,.ic:focus-visible{background:rgba(255,255,255,.22);outline:2px solid rgba(255,255,255,.6)}
+.win{position:absolute;width:min(90%,380px);height:min(72%,430px);background:var(--win);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.4);display:flex;flex-direction:column;overflow:hidden}
+.win.max{left:0!important;top:0!important;width:100%;height:100%;border-radius:0}
+.win.hid{display:none}
+.tb{display:flex;justify-content:space-between;align-items:center;background:var(--bar);padding:4px 4px 4px 10px;font-size:14px;font-weight:bold;touch-action:none;cursor:move}
+.bt button{width:34px;height:30px;border:0;background:none;border-radius:6px;font-size:15px}
+.bt button:active,.bt button:focus-visible{background:rgba(128,128,128,.3)}
+.bt button[data-a="x"]:active{background:#c8402f;color:#fff}
+.body{flex:1;overflow:auto;padding:10px}
+#bar{display:flex;align-items:center;gap:6px;background:var(--task);padding:6px 8px;color:#fff;position:relative;z-index:1000}
+#start{background:var(--acc);color:#1b1405;border:0;border-radius:8px;height:38px;padding:0 14px;font-weight:bold}
+#tasks{flex:1;display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
+.tk{flex:0 0 auto;max-width:130px;height:38px;border:0;border-radius:8px;background:rgba(255,255,255,.1);color:#fff;padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:3px solid transparent}
+.tk.on{background:rgba(255,255,255,.22);border-bottom-color:var(--acc)}
+#clk{font-size:14px;padding:0 4px;font-variant-numeric:tabular-nums}
+#menu{position:absolute;left:8px;bottom:8px;max-height:calc(100% - 16px);overflow-y:auto;width:min(260px,calc(100% - 16px));background:var(--win);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.45);padding:6px;z-index:99999}
+#menu[hidden]{display:none}
+#toast{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);background:var(--task);color:#fff;padding:8px 14px;border-radius:8px;z-index:100000;font-size:14px;text-align:center}
+#toast[hidden]{display:none}
+#menu button{display:flex;align-items:center;gap:10px;width:100%;height:44px;border:0;background:none;border-radius:8px;padding:0 10px;font-size:15px;text-align:left}
+#menu button:active,#menu button:focus-visible{background:var(--bar)}
+#menu hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+textarea{width:100%;height:100%;resize:none;border:0;outline:0;background:transparent;color:inherit;font:16px/1.5 "Trebuchet MS",system-ui,sans-serif}
+.calc{display:flex;flex-direction:column;height:100%;gap:8px}
+.dsp{background:var(--key);border-radius:8px;padding:10px 12px;font-size:30px;text-align:right;overflow:hidden;white-space:nowrap}
+.kp{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.kp button{border:0;border-radius:8px;background:var(--key);font-size:20px;min-height:44px}
+.kp button.op{background:var(--acc);color:#1b1405}
+.kp button:active{filter:brightness(.85)}
+.big{font-size:46px;font-weight:bold;text-align:center;margin:18px 0 4px;font-variant-numeric:tabular-nums}
+.sub{text-align:center;opacity:.75}
+.sw{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.sw button{width:56px;height:56px;border-radius:10px;border:2px solid var(--line)}
+.sw button.on{border-color:var(--acc);outline:2px solid var(--acc)}
+h3{margin:0 0 4px;font-size:15px}
+.row{display:flex;gap:8px;margin-top:8px}
+.row button{border:1px solid var(--line);background:var(--key);border-radius:8px;padding:8px 12px}
+@media (orientation:landscape){.win{height:calc(100% - 24px);width:min(70%,460px)}}
+@media (prefers-reduced-motion:no-preference){.win{animation:pop .15s ease-out}@keyframes pop{from{transform:scale(.96);opacity:0}}}
+</style>
+</head>
+<body>
+<div id="desk"><div id="icons"></div><div id="menu" hidden></div></div>
+<div id="toast" hidden></div>
+<div id="bar"><button id="start" aria-label="Menu mulai">⊞ Mulai</button><div id="tasks"></div><div id="clk"></div></div>
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)};
+var WP=[["#1d3b53","#3a7a8c"],["#3b2a57","#b5527a"],["#17382c","#6b9a5a"],["#2b2f36","#5c6773"]];
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+function setWP(i){var c=WP[i]||WP[0];document.documentElement.style.background=c[0]+" linear-gradient(160deg,"+c[0]+","+c[1]+")";store("rz-wp",i)}
+setWP(+(store("rz-wp")||0));
+
+var apps={
+catatan:{n:"Catatan",i:"📝",b:function(e){var t=document.createElement("textarea");t.placeholder="Tulis sesuatu di sini…";t.value=store("rz-note")||"";t.oninput=function(){store("rz-note",t.value)};e.appendChild(t);e.style.padding="6px 10px"}},
+kalkulator:{n:"Kalkulator",i:"🧮",b:function(e){
+ e.innerHTML='<div class="calc"><div class="dsp">0</div><div class="kp"></div></div>';
+ var d=e.querySelector(".dsp"),kp=e.querySelector(".kp"),s={c:"0",a:0,o:null,f:true};
+ var K=["C","±","%","÷","7","8","9","×","4","5","6","−","1","2","3","+","0",".","=",""];
+ function calc(){var b=+s.c,r=s.o=="+"?s.a+b:s.o=="−"?s.a-b:s.o=="×"?s.a*b:s.o=="÷"?s.a/b:b;s.c=isFinite(r)?String(+r.toFixed(10)):"Tidak bisa";s.a=isFinite(r)?r:0;s.f=true}
+ function press(k){
+  if(/\d/.test(k)){s.c=(s.f||s.c=="0"||isNaN(+s.c))?k:s.c+k;s.f=false}
+  else if(k=="."){if(s.f){s.c="0.";s.f=false}else if(s.c.indexOf(".")<0)s.c+="."}
+  else if(k=="C"){s={c:"0",a:0,o:null,f:true}}
+  else if(k=="±"){s.c=String(-s.c)}
+  else if(k=="%"){s.c=String(+s.c/100)}
+  else if(k=="="){if(s.o){calc();s.o=null}}
+  else{if(s.o&&!s.f)calc();else s.a=+s.c;s.o=k;s.f=true}
+  d.textContent=s.c}
+ K.forEach(function(k){var b=document.createElement("button");b.textContent=k;if(!k)b.style.visibility="hidden";if("÷×−+=".indexOf(k)>-1&&k)b.className="op";b.onclick=function(){press(k)};kp.appendChild(b)})}},
+jam:{n:"Jam",i:"🕒",b:function(e){
+ e.innerHTML='<div class="big"></div><div class="sub"></div>';
+ var a=e.querySelector(".big"),b=e.querySelector(".sub");
+ function t(){var n=new Date();a.textContent=n.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit"});b.textContent=n.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}
+ t();var id=setInterval(t,1000);e.closest(".win").onclose=function(){clearInterval(id)}}},
+setelan:{n:"Setelan",i:"⚙️",b:function(e){
+ e.innerHTML='<h3>Wallpaper</h3><div class="sw"></div><h3 style="margin-top:16px">Tema</h3><div class="row"><button data-t="light">Terang</button><button data-t="dark">Gelap</button><button data-t="auto">Ikuti perangkat</button></div>';
+ var w=e.querySelector(".sw"),cur=+(store("rz-wp")||0);
+ WP.forEach(function(c,i){var b=document.createElement("button");b.setAttribute("aria-label","Wallpaper "+(i+1));b.style.background="linear-gradient(160deg,"+c[0]+","+c[1]+")";if(i==cur)b.className="on";b.onclick=function(){setWP(i);w.querySelectorAll("button").forEach(function(x){x.className=""});b.className="on"};w.appendChild(b)});
+ e.querySelectorAll("[data-t]").forEach(function(b){b.onclick=function(){var v=b.dataset.t;if(v=="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",v)}})}},
+tentang:{n:"Tentang",i:"💻",b:function(e){e.innerHTML='<h3>Launcher Desktop</h3><p>Ketuk ikon untuk membuka aplikasi. Seret judul jendela untuk memindahkannya, ▢ untuk layar penuh, – untuk mengecilkan ke taskbar.</p><p>Catatan tersimpan otomatis di browser ini.</p>'}},
+chrome:{n:"Chrome",i:"🌐",p:["com.android.chrome"]},
+youtube:{n:"YouTube",i:"▶️",p:["com.google.android.youtube"]},
+whatsapp:{n:"WhatsApp",i:"💬",p:["com.whatsapp"]},
+google:{n:"Google",i:"🔍",p:["com.google.android.googlequicksearchbox"]},
+zarchiver:{n:"ZArchiver",i:"🗜️",p:["ru.zdevs.zarchiver"]},
+acode:{n:"Acode",i:"👨‍💻",p:["com.foxdebug.acode","com.foxdebug.acodefree"]}
+};
+
+var wins={},z=10,cnt=0,desk=$("#desk");
+function top(){var b=null,m=0;for(var k in wins){var o=wins[k];if(!o.min&&+o.w.style.zIndex>m){m=+o.w.style.zIndex;b=k}}return b}
+function focus(id){var o=wins[id];o.min=false;o.w.classList.remove("hid");o.w.style.zIndex=++z;tasks()}
+function tasks(){var t=$("#tasks"),tp=top();t.innerHTML="";for(var k in wins){(function(k){var b=document.createElement("button");b.className="tk"+(k==tp?" on":"");b.textContent=apps[k].i+" "+apps[k].n;b.onclick=function(){if(wins[k].min||k!=top())focus(k);else{wins[k].min=true;wins[k].w.classList.add("hid");tasks()}};t.appendChild(b)})(k)}}
+function closeWin(id){var o=wins[id];if(o.w.onclose)o.w.onclose();o.w.remove();delete wins[id];tasks()}
+var tt;
+function toast(m){var t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true},2500)}
+function launch(id){
+ var a=apps[id],L=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.AppLauncher;
+ if(!L){toast("Hanya jalan di aplikasi APK");return}
+ var i=0;
+ (function next(){
+  if(i>=a.p.length){toast(a.n+" tidak ditemukan di HP");return}
+  L.openUrl({url:a.p[i++]}).then(function(r){if(!r||!r.completed)next()}).catch(next)
+ })()
+}
+function openApp(id){
+ $("#menu").hidden=true;
+ if(apps[id].p){launch(id);return}
+ if(wins[id]){focus(id);return}
+ var a=apps[id],w=document.createElement("div");w.className="win";
+ w.innerHTML='<div class="tb"><span>'+a.i+" "+a.n+'</span><span class="bt"><button data-a="min" aria-label="Kecilkan">–</button><button data-a="max" aria-label="Besarkan">▢</button><button data-a="x" aria-label="Tutup">✕</button></span></div><div class="body"></div>';
+ w.style.left=(10+(cnt%5)*22)+"px";w.style.top=(14+(cnt%5)*22)+"px";cnt++;
+ desk.appendChild(w);a.b(w.querySelector(".body"));wins[id]={w:w,min:false};focus(id);
+ w.addEventListener("pointerdown",function(){if(top()!=id)focus(id)});
+ w.querySelector(".bt").onclick=function(e){var x=e.target.dataset.a;if(x=="x")closeWin(id);else if(x=="min"){wins[id].min=true;w.classList.add("hid");tasks()}else if(x=="max")w.classList.toggle("max")};
+ var tb=w.querySelector(".tb"),dx=0,dy=0,drag=false;
+ tb.addEventListener("pointerdown",function(e){if(e.target.closest("button")||w.classList.contains("max"))return;drag=true;dx=e.clientX-w.offsetLeft;dy=e.clientY-w.offsetTop;tb.setPointerCapture(e.pointerId)});
+ tb.addEventListener("pointermove",function(e){if(!drag)return;var x=e.clientX-dx,y=e.clientY-dy;w.style.left=Math.max(-w.offsetWidth+60,Math.min(desk.clientWidth-60,x))+"px";w.style.top=Math.max(0,Math.min(desk.clientHeight-34,y))+"px"});
+ tb.addEventListener("pointerup",function(){drag=false});
+ tb.addEventListener("pointercancel",function(){drag=false});
+ tb.addEventListener("dblclick",function(){w.classList.toggle("max")});
+}
+function loadIcon(k,els){
+ var a=apps[k],P=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.IconPlugin;
+ if(!a.p||!P)return;
+ var i=0;
+ (function next(){
+  if(i>=a.p.length)return;
+  P.getIcon({pkg:a.p[i++]}).then(function(r){
+   els.forEach(function(el){var s=el.querySelector("span");if(!s)return;var im=document.createElement("img");im.src=r.data;im.alt="";im.className="ai";s.replaceWith(im)})
+  }).catch(next)
+ })()
+}
+var ic=$("#icons"),mn=$("#menu");
+Object.keys(apps).forEach(function(k){
+ var b=document.createElement("button");b.className="ic";b.innerHTML="<span>"+apps[k].i+"</span>"+apps[k].n;b.onclick=function(){openApp(k)};ic.appendChild(b);
+ var m=document.createElement("button");m.innerHTML="<span>"+apps[k].i+"</span> "+apps[k].n;m.onclick=function(){openApp(k)};mn.appendChild(m);loadIcon(k,[b,m])});
+mn.appendChild(document.createElement("hr"));
+var rs=document.createElement("button");rs.innerHTML="<span>🔄</span> Tutup semua jendela";rs.onclick=function(){Object.keys(wins).forEach(closeWin);mn.hidden=true};mn.appendChild(rs);
+$("#start").onclick=function(e){e.stopPropagation();mn.hidden=!mn.hidden};
+document.addEventListener("pointerdown",function(e){if(!mn.hidden&&!e.target.closest("#menu")&&!e.target.closest("#start"))mn.hidden=true});
+function clock(){$("#clk").textContent=new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}
+clock();setInterval(clock,10000);
+})();
+</script>
+</body>
+</html>
