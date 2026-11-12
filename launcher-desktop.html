@@ -15,11 +15,17 @@ html{height:100%;background:#1d3b53 linear-gradient(160deg,#1d3b53,#3a7a8c);font
 body{height:100%;margin:0;display:flex;flex-direction:column;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
 button{font:inherit;color:inherit;cursor:pointer}
 #desk{flex:1;position:relative;overflow:hidden;min-height:0}
-#icons{display:grid;grid-template-columns:repeat(auto-fill,78px);gap:6px;padding:14px;align-content:start}
+#icons{display:grid;grid-template-columns:repeat(auto-fill,78px);gap:6px;padding:14px;align-content:start;max-height:100%;overflow-y:auto}
 .ic{background:none;border:0;border-radius:10px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:12px;text-shadow:0 1px 3px rgba(0,0,0,.7)}
 .ic span{font-size:34px;line-height:1}
 .ai{width:44px;height:44px;border-radius:10px;display:block}
 #menu .ai{width:28px;height:28px;border-radius:6px}
+.srch{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--key);color:inherit;font-size:16px;margin-bottom:8px;outline:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,72px);gap:4px;justify-content:center}
+.ap{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px;border-radius:8px;font-size:11px}
+.ap span{font-size:32px;line-height:1}
+.ap em{font-style:normal;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ap:active{background:var(--bar)}
 .ic:active,.ic:focus-visible{background:rgba(255,255,255,.22);outline:2px solid rgba(255,255,255,.6)}
 .win{position:absolute;width:min(90%,380px);height:min(72%,430px);background:var(--win);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.4);display:flex;flex-direction:column;overflow:hidden}
 .win.max{left:0!important;top:0!important;width:100%;height:100%;border-radius:0}
@@ -30,7 +36,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .bt button[data-a="x"]:active{background:#c8402f;color:#fff}
 .body{flex:1;overflow:auto;padding:10px}
 #bar{display:flex;align-items:center;gap:6px;background:var(--task);padding:6px 8px;color:#fff;position:relative;z-index:1000}
-#start{background:var(--acc);color:#1b1405;border:0;border-radius:8px;height:38px;padding:0 14px;font-weight:bold}
+#start{background:rgba(255,255,255,.12);border:0;border-radius:8px;height:38px;width:48px;padding:0;display:flex;align-items:center;justify-content:center}
+#start:active,#start:focus-visible{background:rgba(255,255,255,.28)}
+#start svg{width:28px;height:28px}
 #tasks{flex:1;display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
 .tk{flex:0 0 auto;max-width:130px;height:38px;border:0;border-radius:8px;background:rgba(255,255,255,.1);color:#fff;padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:3px solid transparent}
 .tk.on{background:rgba(255,255,255,.22);border-bottom-color:var(--acc)}
@@ -42,6 +50,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 #menu button{display:flex;align-items:center;gap:10px;width:100%;height:44px;border:0;background:none;border-radius:8px;padding:0 10px;font-size:15px;text-align:left}
 #menu button:active,#menu button:focus-visible{background:var(--bar)}
 #menu hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+textarea,input{user-select:text;-webkit-user-select:text}
 textarea{width:100%;height:100%;resize:none;border:0;outline:0;background:transparent;color:inherit;font:16px/1.5 "Trebuchet MS",system-ui,sans-serif}
 .calc{display:flex;flex-direction:column;height:100%;gap:8px}
 .dsp{background:var(--key);border-radius:8px;padding:10px 12px;font-size:30px;text-align:right;overflow:hidden;white-space:nowrap}
@@ -64,7 +73,7 @@ h3{margin:0 0 4px;font-size:15px}
 <body>
 <div id="desk"><div id="icons"></div><div id="menu" hidden></div></div>
 <div id="toast" hidden></div>
-<div id="bar"><button id="start" aria-label="Menu mulai">⊞ Mulai</button><div id="tasks"></div><div id="clk"></div></div>
+<div id="bar"><button id="start" aria-label="Menu mulai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16a8 8 0 0 1 16 0H4z" fill="#3ddc84"/><path d="M8 7.4 6.4 4.8M16 7.4l1.6-2.6" stroke="#3ddc84" stroke-width="1.4" stroke-linecap="round" fill="none"/><circle cx="9" cy="12.4" r="1" fill="#0f1c26"/><circle cx="15" cy="12.4" r="1" fill="#0f1c26"/></svg></button><div id="tasks"></div><div id="clk"></div></div>
 <script>
 (function(){
 var $=function(s){return document.querySelector(s)};
@@ -95,25 +104,39 @@ jam:{n:"Jam",i:"🕒",b:function(e){
  var a=e.querySelector(".big"),b=e.querySelector(".sub");
  function t(){var n=new Date();a.textContent=n.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit"});b.textContent=n.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}
  t();var id=setInterval(t,1000);e.closest(".win").onclose=function(){clearInterval(id)}}},
-setelan:{n:"Setelan",i:"⚙️",b:function(e){
+setelan:{n:"Tampilan",i:"⚙️",b:function(e){
  e.innerHTML='<h3>Wallpaper</h3><div class="sw"></div><h3 style="margin-top:16px">Tema</h3><div class="row"><button data-t="light">Terang</button><button data-t="dark">Gelap</button><button data-t="auto">Ikuti perangkat</button></div>';
  var w=e.querySelector(".sw"),cur=+(store("rz-wp")||0);
  WP.forEach(function(c,i){var b=document.createElement("button");b.setAttribute("aria-label","Wallpaper "+(i+1));b.style.background="linear-gradient(160deg,"+c[0]+","+c[1]+")";if(i==cur)b.className="on";b.onclick=function(){setWP(i);w.querySelectorAll("button").forEach(function(x){x.className=""});b.className="on"};w.appendChild(b)});
  e.querySelectorAll("[data-t]").forEach(function(b){b.onclick=function(){var v=b.dataset.t;if(v=="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",v)}})}},
-tentang:{n:"Tentang",i:"💻",b:function(e){e.innerHTML='<h3>Launcher Desktop</h3><p>Ketuk ikon untuk membuka aplikasi. Seret judul jendela untuk memindahkannya, ▢ untuk layar penuh, – untuk mengecilkan ke taskbar.</p><p>Catatan tersimpan otomatis di browser ini.</p>'}},
+tentang:{n:"Tentang",i:"💻",b:function(e){e.innerHTML='<h3>Launcher Desktop</h3><p>Ketuk ikon untuk membuka aplikasi. Seret judul jendela untuk memindahkannya, ▢ untuk layar penuh, – untuk mengecilkan ke taskbar.</p><p>Catatan tersimpan otomatis di browser ini.</p>';var C=window.Capacitor,PL=(C&&C.Plugins)||{};e.innerHTML+='<p>Versi: 12-nov-b<br>Plugin ikon: '+(PL.IconPlugin?"aktif":"tidak ada")+'<br>Plugin buka aplikasi: '+(PL.AppLauncher?"aktif":"tidak ada")+'</p>'}},
 chrome:{n:"Chrome",i:"🌐",p:["com.android.chrome"]},
 youtube:{n:"YouTube",i:"▶️",p:["com.google.android.youtube"]},
 whatsapp:{n:"WhatsApp",i:"💬",p:["com.whatsapp"]},
-google:{n:"Google",i:"🔍",p:["com.google.android.googlequicksearchbox"]},
+google:{n:"Google",i:"🔍",ip:"com.google.android.googlequicksearchbox",b:function(){}},
 zarchiver:{n:"ZArchiver",i:"🗜️",p:["ru.zdevs.zarchiver"]},
-acode:{n:"Acode",i:"👨‍💻",p:["com.foxdebug.acode","com.foxdebug.acodefree"]}
+acode:{n:"Acode",i:"👨‍💻",p:["com.foxdebug.acode","com.foxdebug.acodefree"]},
+pengaturan:{n:"Pengaturan",i:"🔧",p:["com.android.settings"]},
+semua:{n:"Semua Aplikasi",i:"📱",b:function(e,f){
+ var P=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.IconPlugin;
+ e.innerHTML='<input class="srch" placeholder="Cari aplikasi…"><div class="grid"></div>';
+ var g=e.querySelector(".grid"),q=e.querySelector(".srch");
+ if(!P){g.textContent="Hanya jalan di aplikasi APK";return}
+ P.getApps().then(function(r){
+  var L=r.apps.filter(function(a){return !f||f(a)}).sort(function(a,c){return a.label.localeCompare(c.label)}),io=new IntersectionObserver(function(es){es.forEach(function(x){if(!x.isIntersecting)return;io.unobserve(x.target);P.getIcon({pkg:x.target._p}).then(function(d){var im=document.createElement("img"),s=x.target.querySelector("span");im.src=d.data;im.alt="";im.className="ai";if(s)s.replaceWith(im)}).catch(function(){})})},{root:e});
+  L.forEach(function(a){var t=document.createElement("button"),m=document.createElement("em");t.className="ap";t.dataset.n=a.label.toLowerCase();t.innerHTML="<span>📦</span>";m.textContent=a.label;t.appendChild(m);t._p=a.pkg;t.onclick=function(){openPkg(a.label,a.pkg)};g.appendChild(t);io.observe(t)});
+  q.oninput=function(){var v=q.value.toLowerCase();g.querySelectorAll(".ap").forEach(function(t){t.style.display=t.dataset.n.indexOf(v)>-1?"":"none"})}
+ }).catch(function(){g.textContent="Gagal membaca daftar aplikasi"})
+}}
 };
+apps.google.b=function(e){apps.semua.b(e,function(a){return /^com\.google\.|^com\.android\.chrome$|^com\.android\.vending$/.test(a.pkg)})};
 
 var wins={},z=10,cnt=0,desk=$("#desk");
 function top(){var b=null,m=0;for(var k in wins){var o=wins[k];if(!o.min&&+o.w.style.zIndex>m){m=+o.w.style.zIndex;b=k}}return b}
 function focus(id){var o=wins[id];o.min=false;o.w.classList.remove("hid");o.w.style.zIndex=++z;tasks()}
 function tasks(){var t=$("#tasks"),tp=top();t.innerHTML="";for(var k in wins){(function(k){var b=document.createElement("button");b.className="tk"+(k==tp?" on":"");b.textContent=apps[k].i+" "+apps[k].n;b.onclick=function(){if(wins[k].min||k!=top())focus(k);else{wins[k].min=true;wins[k].w.classList.add("hid");tasks()}};t.appendChild(b)})(k)}}
 function closeWin(id){var o=wins[id];if(o.w.onclose)o.w.onclose();o.w.remove();delete wins[id];tasks()}
+function openPkg(n,p){var L=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.AppLauncher;if(!L){toast("Hanya jalan di aplikasi APK");return}L.openUrl({url:p}).then(function(r){if(!r||!r.completed)toast(n+" tidak bisa dibuka")}).catch(function(){toast(n+" tidak bisa dibuka")})}
 var tt;
 function toast(m){var t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true},2500)}
 function launch(id){
@@ -133,6 +156,9 @@ function openApp(id){
  w.innerHTML='<div class="tb"><span>'+a.i+" "+a.n+'</span><span class="bt"><button data-a="min" aria-label="Kecilkan">–</button><button data-a="max" aria-label="Besarkan">▢</button><button data-a="x" aria-label="Tutup">✕</button></span></div><div class="body"></div>';
  w.style.left=(10+(cnt%5)*22)+"px";w.style.top=(14+(cnt%5)*22)+"px";cnt++;
  desk.appendChild(w);a.b(w.querySelector(".body"));wins[id]={w:w,min:false};focus(id);
+ var mx=desk.clientHeight-w.offsetHeight,my=desk.clientWidth-w.offsetWidth;
+ if(parseInt(w.style.top)>mx)w.style.top=Math.max(0,mx)+"px";
+ if(parseInt(w.style.left)>my)w.style.left=Math.max(0,my)+"px";
  w.addEventListener("pointerdown",function(){if(top()!=id)focus(id)});
  w.querySelector(".bt").onclick=function(e){var x=e.target.dataset.a;if(x=="x")closeWin(id);else if(x=="min"){wins[id].min=true;w.classList.add("hid");tasks()}else if(x=="max")w.classList.toggle("max")};
  var tb=w.querySelector(".tb"),dx=0,dy=0,drag=false;
@@ -144,11 +170,11 @@ function openApp(id){
 }
 function loadIcon(k,els){
  var a=apps[k],P=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.IconPlugin;
- if(!a.p||!P)return;
+ var pk=a.p||(a.ip?[a.ip]:0);if(!pk||!P)return;
  var i=0;
  (function next(){
-  if(i>=a.p.length)return;
-  P.getIcon({pkg:a.p[i++]}).then(function(r){
+  if(i>=pk.length)return;
+  P.getIcon({pkg:pk[i++]}).then(function(r){
    els.forEach(function(el){var s=el.querySelector("span");if(!s)return;var im=document.createElement("img");im.src=r.data;im.alt="";im.className="ai";s.replaceWith(im)})
   }).catch(next)
  })()
